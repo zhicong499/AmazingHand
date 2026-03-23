@@ -187,6 +187,18 @@ STL or Step file can be found [here](https://github.com/pollen-robotics/AmazingH
 
 Thanks to Jianliang Shen !
 
+- ### Amazing Hand Control : Python GUI and CLI tools for controlling the AmazingHand
+Key features :
+- Control the fingers independently
+- Real time monitoring of servo feedbacks
+- Create custom animations by saving positions and replaying them sequentially
+  
+![AmazingHandControl](assets/AmazingHandControl.jpg)
+
+Link to repository : [Link](https://github.com/Betatester777/AmazingHandControl)
+
+Thanks to Betatester777 !
+
 - ### Amazing hand with SG90 servos + force control setup 🔥
 
 ![Force_control](/assets/Force_control.jpg)
