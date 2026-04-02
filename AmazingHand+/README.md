@@ -71,8 +71,8 @@ Main changes on assembly is on "Step 2 : Finger assembly" , slides 12, 17 & 18. 
 "Step 3 : finger calibration" remains the same principle, but with slightly different max angles. Details explain on slides 22 & 23.
 
 Assembly guide for the Amazing Hand + in combination with standard components in the BOM is here:  
-![Assembly Guide](/docs/AmazingHand+_Assembly.pdf)  
-![Assembly_example](/assets/Assembly+.jpg)   
+![Assembly Guide](docs/AmazingHand+_Assembly.pdf)  
+![Assembly_example](assets/Assembly+.jpg)   
 
 In addition, a very annoying ultrasound could be heard by some of you, because of the pwm frequency set to 16KHz by defaut. This frequency could be changed to 24KHz by modifying the register 18 "seting byte" to 44, and save (using feetech software). This may need a servo reboot to be applied then.
 ![PWM frequency](assets/PWM-frequency.jpg)
