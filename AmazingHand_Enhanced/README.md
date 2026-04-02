@@ -17,8 +17,10 @@ Mechanical design is licensed under a:
 Based on Amazing Hand initial project, here is an update with new motors which will offer :
 - Full backdrivability
 - Better accuracy
-- More Speed
+- More Torque & Speed
 - Same overall volume
+
+![Servo-Enhanced](assets/Servo-Enhanced.jpg) 
 
 Thanks to the use of Feetech STS3032 motors, Amazing Hand Enhanced pushes the boundaries of the original version.
 
@@ -58,14 +60,14 @@ Specific parts for Amazing Hand Enhanced :
 
 => Specific STL and Steps files for Amazing Hand Enhanced can be found [here](https://github.com/pollen-robotics/AmazingHand/tree/AmazingHand_Enhanced/cad) 
 
-Everyone can access the Onshape document of Amazing Hand Enhanced :   [Link Onshape](https://cad.onshape.com/documents/430ff184cf3dd9557aaff2be/w/b018c00d2300dcc36080a900/e/a5789448a382c9e7e5c5750a)  
+Everyone can access the Onshape document of Amazing Hand Enhanced :   [Link Onshape](https://cad.onshape.com/documents/430ff184cf3dd9557aaff2be/w/b018c00d2300dcc36080a900/e/d79fbb3641873de0a515037e)  
 
 
 ## Assembly Steps
 
 First change is on "Step 1 : Preparing components" , slide 6. Some screws (coming with ball joints) length need to be adjusted, and custom servo horn need to be prepared too.
 
-Main changes on assembly is on "Step 2 : Finger assembly" , slides 12, 17 & 18. Now there is only 1 finger frame part, and more screws to hold motors
+Main changes on assembly is on "Step 2 : Finger assembly" , slides 12, 17 & 18. Now there is only 1 finger frame part, and more screws to hold motors.
 
 "Step 3 : finger calibration" remains the same principle, but with slightly different max angles. Details explain on slides 22 & 23.
 
