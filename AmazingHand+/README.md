@@ -12,18 +12,18 @@ Mechanical design is licensed under a:
 
 
 
-# Amazing Hand + project
+# Amazing Hand + 
 
-![Patterns](assets/Patterns_Overview.jpg)
 
-Based on Amzing Hand initial project, here is an update with new motors which will offer :
+Based on Amazing Hand initial project, here is an update with new motors which will offer :
 - Full backdrivability
 - Better accuracy
 - More Speed
 - Same overall volume
 
-By using STS3032 feetech motors, Amazing Hand + is pushing forward the limitation of the initial version. 
-Counterpart is that price will be increased too...but still remain reasonnable compare to most of other robotic hands available !
+Thanks to the use of Feetech STS3032 motors, Amazing Hand + pushes the boundaries of the original version.
+
+In return, its price will also increase… but will still remain reasonable compared to most other robotic hands available !
 
 
 
@@ -79,6 +79,6 @@ A basic demo is available with both Python.
 
 
 
-# AmazingHand advanced Demo
+# AmazingHand+ advanced Demo
 To be released
 
