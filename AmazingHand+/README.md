@@ -32,34 +32,37 @@ In return, its price will also increase… but will still remain reasonable comp
 - [Modifications](#modifications)
     - [BOM (Bill Of Materials)](#bom-bill-of-materials)
     - [CAD Files and Onshape document](#cad-files-and-onshape-document)
-    - [Specific Assembly Step](#specific-assembly_steps)
+    - [Assembly Step](#assembly-steps)
     - [Run_basic_Demo](#run-basic-demo)    
-- [Disclaimer](#disclaimer)
-- [AmazingHand + advanced Demo](#amazinghand-+-advanced-demo)   
+- [AmazingHand+ advanced Demo](#amazinghand+-advanced-demo)   
 
 
 # Build Resources
 ## BOM (Bill Of Materials)
 
-All standard components are the same, except motors 
-List of all needed components is available here:  
-[AmazingHand+ BOM](https://docs.google.com/spreadsheets/d/180ta_jQhF-YGHinabTnSPGtvGcQORVJ9lFrNiKcSqUE/edit?gid=1269903342#gid=1269903342)  
+All standard components are the same, except motors.
+
+List of all needed components is available here:  [AmazingHand+ BOM](https://docs.google.com/spreadsheets/d/180ta_jQhF-YGHinabTnSPGtvGcQORVJ9lFrNiKcSqUE/edit?gid=1269903342#gid=1269903342)  
 ![BOM](assets/BOM+.jpg)
 
 
 ## CAD Files and Onshape document
-Specific STL and Steps files for Amazing Hand + can be found [here](https://github.com/pollen-robotics/AmazingHand/tree/AmazingHand+/cad) 
+
 All fingers parts are the same for both version : Proximal / Distal / Gimbal / Link
+
+=> Please refer to original version for all these parts [here](https://github.com/pollen-robotics/AmazingHand/tree/main/cad) 
+
 Specific parts for Amazing Hand + :
 - Finger frame part 1 & 2 become Finger frame (only 1 part)
 - Custom servo horn is needed, to be 3D printed
 - Hand Plate / Wrist interface / Palm shell & Top shell are slightly differen (due to custom servo horn and increased servo thickness)
 
-Everyone can access the Onshape document too:   
-[Link Onshape](https://cad.onshape.com/documents/430ff184cf3dd9557aaff2be/w/b018c00d2300dcc36080a900/e/a5789448a382c9e7e5c5750a)  
+=> Specific STL and Steps files for Amazing Hand+ can be found [here](https://github.com/pollen-robotics/AmazingHand/tree/AmazingHand+/cad) 
+
+Everyone can access the Onshape document of Amazing Hand+ :   [Link Onshape](https://cad.onshape.com/documents/430ff184cf3dd9557aaff2be/w/b018c00d2300dcc36080a900/e/a5789448a382c9e7e5c5750a)  
 
 
-## Specific Assembly Step
+## Assembly Steps
 
 First change is on "Step 1 : Preparing components" , slide 6. Some screws (coming with ball joints) length need to be adjusted, and custom servo horn need to be prepared too.
 
@@ -67,8 +70,12 @@ Main changes on assembly is on "Step 2 : Finger assembly" , slides 12, 17 & 18. 
 
 "Step 3 : finger calibration" remains the same principle, but with slightly different max angles. Details explain on slides 22 & 23.
 
+Assembly guide for the Amazing Hand + in combination with standard components in the BOM is here:  
+![Assembly Guide](/docs/AmazingHand+_Assembly.pdf)  
+![Assembly_example](/assets/Assembly+.jpg)   
+
 In addition, a very annoying ultrasound could be heard by some of you, because of the pwm frequency set to 16KHz by defaut. This frequency could be changed to 24KHz by modifying the register 18 "seting byte" to 44, and save (using feetech software). This may need a servo reboot to be applied then.
-[PWM frequency](https://github.com/pollen-robotics/AmazingHand/tree/AmazingHand+/assets/PWM-frequency.jpg)
+![PWM frequency](assets/PWM-frequency.jpg)
 
 
 ## Run basic Demo
