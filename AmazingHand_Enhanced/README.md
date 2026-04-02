@@ -49,7 +49,7 @@ List of all needed components is available here:  [AmazingHand_Enhanced BOM](htt
 
 ## CAD Files and Onshape document
 
-All fingers parts are the same for both version : Proximal / Distal / Gimbal / Link
+All fingers parts are the same for both version : Proximal / Distal / Gimbal / Link / Finger shells
 
 => Please refer to original version for all these parts [here](https://github.com/pollen-robotics/AmazingHand/tree/main/cad) 
 
@@ -58,7 +58,7 @@ Specific parts for Amazing Hand Enhanced :
 - Custom servo horn is needed, to be 3D printed
 - Hand Plate / Wrist interface / Palm shell & Top shell are slightly differen (due to custom servo horn and increased servo thickness)
 
-=> Specific STL and Steps files for Amazing Hand Enhanced can be found [here](https://github.com/pollen-robotics/AmazingHand/tree/AmazingHand_Enhanced/cad) 
+=> Specific STL and Steps files for Amazing Hand Enhanced can be found [here](https://github.com/pollen-robotics/AmazingHand/tree/Amazing-Hand-Enhanced/AmazingHand_Enhanced/cad) 
 
 Everyone can access the Onshape document of Amazing Hand Enhanced :   [Link Onshape](https://cad.onshape.com/documents/430ff184cf3dd9557aaff2be/w/b018c00d2300dcc36080a900/e/d79fbb3641873de0a515037e)  
 
@@ -83,7 +83,7 @@ In addition, a very annoying ultrasound could be heard by some of you, because o
 
 A basic demo is available with both Python.
 
-- Python script: "AmazingHand_Demo.py" [here](https://github.com/pollen-robotics/AmazingHand/tree/AmazingHand_Enhanced/PythonExample)
+- Python script: "AmazingHand_Demo.py" [here](https://github.com/pollen-robotics/AmazingHand/tree/Amazing-Hand-Enhanced/AmazingHand_Enhanced/PythonExample)
 
 You can use an external 6V / 2A power supply for these motors.
 
