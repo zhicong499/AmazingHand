@@ -14,6 +14,7 @@ Mechanical design is licensed under a:
 # Amazing Hand Enhanced 
 
 
+
 Based on Amazing Hand initial project, here is an update with new motors which will offer :
 - Full backdrivability
 - Better accuracy
@@ -23,6 +24,8 @@ Based on Amazing Hand initial project, here is an update with new motors which w
 ![Servo-Enhanced](assets/Servo-Enhanced.jpg) 
 
 Thanks to the use of Feetech STS3032 motors, Amazing Hand Enhanced pushes the boundaries of the original version.
+
+https://github.com/user-attachments/assets/4253e112-d809-4588-8c8a-1002693c89ec
 
 In return, its price will also increase… but will still remain reasonable compared to most other robotic hands available !
 
