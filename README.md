@@ -49,6 +49,8 @@ Two control methods are available:
 Detailed explanations are available for both ways, and basic demo software is also available.
 Up to you !
 
+##
+## UPDATE : Amazing Hand become **enhanced**, follow the branch "Amazing Hand Enhanced" : https://github.com/pollen-robotics/AmazingHand/tree/Amazing-Hand-Enhanced/AmazingHand_Enhanced
 
 ## Table of contents
 
