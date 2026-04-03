@@ -11,17 +11,12 @@ Mechanical design is licensed under a:
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY-lightgrey.svg
 
 
-
 # Amazing Hand project
 
 ![Patterns](assets/Patterns_Overview.jpg)
 
 Robotic hands are often very expensive and not so expressive. More dexterous ones often need cables and deported actuators in the forearm, i.e.,
 
-The aim of this project is to be able to explore humanoid hand possibilities on a real robot (and Reachy2 is the perfect candidate for that !) with moderate cost.
-=> Wrist interface is designed for Reachy2's wrist (Orbita 3D), but it can be easily adapted to other robot's wrist...
-
-![Reachy](assets/Reachy.jpg)
 
 Amazing Hand is:
 - 8 dofs humanoid hand with 4 fingers
@@ -30,25 +25,27 @@ Amazing Hand is:
 - All actuators inside the hand, without any cables
 - 3D printable
 - 400g weight
-- low-cost (<200€)
+- low-cost
 - open-source
 
 [AmazingHand_Overview](/docs/AmazingHand_Overview.pdf)
 
 ![Hand Overview](assets/Hand_Overview.jpg)
 Each finger is driven by a parallel mechanism. 
-That means 2x small Feetech SCS0009 servos are used to move each finger in flexion/extension and abduction/adduction
+That means 2x small Feetech servos are used to move each finger in flexion/extension and abduction/adduction
+
 
 ![Finger Overview](assets/Finger_Overview.jpg)
-
 
 Two control methods are available:
 - Use a serial bus driver (Waveshare i.e.) + Python script
 - Use an Arduino + Feetech TTL Linker
 
-Detailed explanations are available for both ways, and basic demo software is also available.
-Up to you !
+Detailed explanations are available for both ways, and basic demo software is also available. Up to you !
 
+## 2 versions exist :
+- with SCS0009 (Original Amazing Hand) => <200€
+- with STS3032 (Amazing Hand Enhanced) => <350€ (see Amazing Hand Enhanced folder https://github.com/pollen-robotics/AmazingHand/tree/Amazing-Hand-Enhanced/AmazingHand_Enhanced)
 
 ## Table of contents
 
