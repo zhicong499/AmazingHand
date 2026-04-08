@@ -662,29 +662,29 @@
     </body>
   </worldbody>
   <asset>
-    <mesh file="proximal.stl"/>
-    <mesh file="m2_rod_l18.stl"/>
-    <mesh file="std00333_plast_tcb_torx_2_5x8__configuration_copy_of_default.stl"/>
-    <mesh file="rotule_ball.stl"/>
-    <mesh file="ph_pan_head_screw_m2x0_40_x_10__2803432263e518bbd16bccbbef8784ed.stl"/>
-    <mesh file="gimbal.stl"/>
-    <mesh file="scs0009.stl"/>
-    <mesh file="plain_washer_large_grade_a_m2_5__9a369f0dc77bf9c598cdf3fb468977e5.stl"/>
-    <mesh file="distal_shell.stl"/>
-    <mesh file="parallel_pin_2_x_10__fee063fca0c8b40e46bbc4ffff61d999.stl"/>
-    <mesh file="rotule_lever.stl"/>
-    <mesh file="distal.stl"/>
     <mesh file="r_hand_plate.stl"/>
-    <mesh file="std00447_thermoplastique_m2_5x6__configuration_default.stl"/>
-    <mesh file="parallel_pin_2_x_16__da4b7ddbe9d803fe3fbc70f2e822b99b.stl"/>
-    <mesh file="custom_servo_horn.stl"/>
+    <mesh file="ph_pan_head_screw_m2x0_40_x_10__2803432263e518bbd16bccbbef8784ed.stl"/>
+    <mesh file="proximal.stl"/>
+    <mesh file="rotule_lever.stl"/>
+    <mesh file="rotule_ball.stl"/>
+    <mesh file="gimbal.stl"/>
+    <mesh file="plain_washer_large_grade_a_m2_5__9a369f0dc77bf9c598cdf3fb468977e5.stl"/>
     <mesh file="proximal_shell.stl"/>
-    <mesh file="link.stl"/>
-    <mesh file="finger_frame_2.stl"/>
-    <mesh file="r_wrist_interface.stl"/>
-    <mesh file="finger_frame_1.stl"/>
     <mesh file="bushing_0608_04.stl"/>
+    <mesh file="custom_servo_horn.stl"/>
+    <mesh file="distal.stl"/>
+    <mesh file="distal_shell.stl"/>
+    <mesh file="std00333_plast_tcb_torx_2_5x8__configuration_copy_of_default.stl"/>
     <mesh file="spacer.stl"/>
+    <mesh file="finger_frame_1.stl"/>
+    <mesh file="r_wrist_interface.stl"/>
+    <mesh file="scs0009.stl"/>
+    <mesh file="m2_rod_l18.stl"/>
+    <mesh file="link.stl"/>
+    <mesh file="parallel_pin_2_x_16__da4b7ddbe9d803fe3fbc70f2e822b99b.stl"/>
+    <mesh file="std00447_thermoplastique_m2_5x6__configuration_default.stl"/>
+    <mesh file="parallel_pin_2_x_10__fee063fca0c8b40e46bbc4ffff61d999.stl"/>
+    <mesh file="finger_frame_2.stl"/>
     <material name="scs0009_material" rgba="0.262745 0.282353 0.301961 1"/>
     <material name="finger_frame_1_material" rgba="0.8 0.8 0.8 1"/>
     <material name="r_hand_plate_material" rgba="0.301961 0.301961 0.301961 1"/>
