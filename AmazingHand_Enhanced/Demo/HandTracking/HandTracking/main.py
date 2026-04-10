@@ -217,75 +217,70 @@ def run_calibration(cap, hands):
     r_tip_keys = ["r_tip1", "r_tip2", "r_tip3", "r_tip4"]
     l_tip_keys = ["l_tip1", "l_tip2", "l_tip3", "l_tip4"]
 
-    try:
-        while True:
-            ret, frame = cap.read()
-            if not ret:
-                continue
-            frame = cv2.flip(frame, 1)
-            frame, r_res, l_res = process_img(hands, frame)
-            h, w = frame.shape[:2]
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            continue
+        frame = cv2.flip(frame, 1)
+        frame, r_res, l_res = process_img(hands, frame)
+        h, w = frame.shape[:2]
 
-            if not collecting:
-                _draw_text_bg(frame, "=== HAND CALIBRATION ===", (20, 45), 0.9, (0, 255, 255))
-                _draw_text_bg(frame, "Open both hands fully (palms facing camera)", (20, 90))
-                _draw_text_bg(frame, "Press SPACE to start", (20, 130))
-                _draw_text_bg(frame, "Press Q to skip", (20, 170), color=(160, 160, 160))
-            else:
-                bar_w = int(w * 0.4)
-                gap = int(w * 0.1)
-                bar_y = h // 2 - 15
+        if not collecting:
+            _draw_text_bg(frame, "=== HAND CALIBRATION ===", (20, 45), 0.9, (0, 255, 255))
+            _draw_text_bg(frame, "Open both hands fully (palms facing camera)", (20, 90))
+            _draw_text_bg(frame, "Press SPACE to start", (20, 130))
+            _draw_text_bg(frame, "Press Q to skip", (20, 170), color=(160, 160, 160))
+        else:
+            bar_w = int(w * 0.4)
+            gap = int(w * 0.1)
+            bar_y = h // 2 - 15
 
-                for label, history, res, tip_keys, bar_x in (
-                    ("LEFT",  l_history, l_res, l_tip_keys, gap),
-                    ("RIGHT", r_history, r_res, r_tip_keys, gap + bar_w + gap),
-                ):
-                    hand_complete = res is not None and all(k in res[0] for k in tip_keys)
-                    if hand_complete:
-                        tips = np.array([res[0][k] for k in tip_keys])
-                        history.append(tips)
+            for label, history, res, tip_keys, bar_x in (
+                ("LEFT",  l_history, l_res, l_tip_keys, gap),
+                ("RIGHT", r_history, r_res, r_tip_keys, gap + bar_w + gap),
+            ):
+                hand_complete = res is not None and all(k in res[0] for k in tip_keys)
+                if hand_complete:
+                    tips = np.array([res[0][k] for k in tip_keys])
+                    history.append(tips)
 
-                    progress = min(len(history) / CALIB_FRAMES, 1.0)
-                    done = len(history) >= CALIB_FRAMES
+                progress = min(len(history) / CALIB_FRAMES, 1.0)
+                done = len(history) >= CALIB_FRAMES
 
-                    bar_color = (0, 200, 0) if not done else (0, 160, 255)
-                    cv2.rectangle(
-                        frame, (bar_x, bar_y), (bar_x + bar_w, bar_y + 30), (40, 40, 40), -1
-                    )
-                    cv2.rectangle(
-                        frame,
-                        (bar_x, bar_y),
-                        (bar_x + int(bar_w * progress), bar_y + 30),
-                        bar_color,
-                        -1,
-                    )
-                    cv2.rectangle(
-                        frame, (bar_x, bar_y), (bar_x + bar_w, bar_y + 30), (255, 255, 255), 2
-                    )
-                    status = "OK" if done else f"{int(progress * 100)}%"
-                    _draw_text_bg(frame, f"{label}: {status}", (bar_x, bar_y - 10), 0.7,
-                                  (0, 255, 0) if not done else (0, 160, 255))
+                bar_color = (0, 160, 255) if not done else (0, 200, 0)
+                cv2.rectangle(
+                    frame, (bar_x, bar_y), (bar_x + bar_w, bar_y + 30), (40, 40, 40), -1
+                )
+                cv2.rectangle(
+                    frame,
+                    (bar_x, bar_y),
+                    (bar_x + int(bar_w * progress), bar_y + 30),
+                    bar_color,
+                    -1,
+                )
+                cv2.rectangle(
+                    frame, (bar_x, bar_y), (bar_x + bar_w, bar_y + 30), (255, 255, 255), 2
+                )
+                status = "OK" if done else f"{int(progress * 100)}%"
+                _draw_text_bg(frame, f"{label}: {status}", (bar_x, bar_y - 10), 0.7,
+                              (0, 160, 255) if not done else (0, 255, 0))
 
-                    if not hand_complete and not done:
-                        history.clear()  # reset only this hand on loss
+                if not hand_complete and not done:
+                    history.clear()  # reset only this hand on loss
 
-                if len(r_history) >= CALIB_FRAMES and len(l_history) >= CALIB_FRAMES:
-                    break
+            if len(r_history) >= CALIB_FRAMES and len(l_history) >= CALIB_FRAMES:
+                break
 
-            cv2.imshow("MediaPipe Hands", frame)
-            key = cv2.waitKey(1) & 0xFF
+        cv2.imshow("MediaPipe Hands", frame)
+        key = cv2.waitKey(1) & 0xFF
 
-            if key == ord("q"):
-                print("Calibration skipped - using identity corrections.")
-                return {"r": CalibResult(), "l": CalibResult()}
-            if key == ord(" ") and not collecting:
-                collecting = True
-                r_history.clear()
-                l_history.clear()
-
-    except KeyboardInterrupt:
-        cv2.destroyAllWindows()
-        raise
+        if key == ord("q"):
+            print("Calibration skipped - using identity corrections.")
+            return {"r": CalibResult(), "l": CalibResult()}
+        if key == ord(" ") and not collecting:
+            collecting = True
+            r_history.clear()
+            l_history.clear()
 
     def _compute(history):
         mean_tips = np.mean(np.array(history), axis=0)  # (4, 3)
