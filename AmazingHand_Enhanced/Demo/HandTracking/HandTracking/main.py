@@ -196,127 +196,118 @@ def process_img(hand_proc, image):
 
 
 def run_calibration(cap, hands):
-    """Interactive calibration phase.
+    """Calibrate both hands simultaneously.
 
-    Asks the user to hold their hand fully open.  Collects CALIB_FRAMES of
-    MediaPipe detections, then computes the mean X coordinate of tip1, tip2
-    and tip3.  That value is subtracted during tracking so that X=0 for each
-    of the three fingertips in the open-hand reference pose.
+    The user opens both hands fully and presses SPACE.  Frames are collected
+    for each hand independently; a hand whose history resets (lost detection)
+    doesn't affect the other.  The loop ends when both hands have reached
+    CALIB_FRAMES valid frames.
 
-    Returns a CalibResult (identity offsets if the user presses Q to skip).
+    Returns a dict {"r": CalibResult, "l": CalibResult}.
+    Press Q to skip entirely (identity offsets for both hands).
     """
-    tip_history = []  # list of (4, 3) arrays
-    state = "waiting"  # "waiting" | "collecting" | "done"
-
     print("=== CALIBRATION ===")
-    print("Open your hand fully and press SPACE to start collecting frames.")
-    print("Press Q to skip calibration.")
+    print("Open both hands fully and press SPACE to start.")
+    print("Press Q to skip.")
 
-    while state != "done":
-        ret, frame = cap.read()
-        if not ret:
-            continue
-        frame = cv2.flip(frame, 1)
-        frame, r_res, _ = process_img(hands, frame)
-        h, w = frame.shape[:2]
+    r_history = []  # list of (4, 3) arrays for right hand
+    l_history = []  # list of (4, 3) arrays for left hand
+    collecting = False
 
-        if state == "waiting":
-            _draw_text_bg(
-                frame, "=== HAND CALIBRATION ===", (20, 45), 0.9, (0, 255, 255)
-            )
-            _draw_text_bg(frame, "Open your hand fully (palm facing camera)", (20, 90))
-            _draw_text_bg(frame, "Press SPACE to start", (20, 130))
-            _draw_text_bg(frame, "Press Q to skip", (20, 170), color=(160, 160, 160))
+    r_tip_keys = ["r_tip1", "r_tip2", "r_tip3", "r_tip4"]
+    l_tip_keys = ["l_tip1", "l_tip2", "l_tip3", "l_tip4"]
 
-        elif state == "collecting":
-            r_tip_keys = ["r_tip1", "r_tip2", "r_tip3", "r_tip4"]
-            hand_complete = r_res is not None and all(k in r_res[0] for k in r_tip_keys)
+    try:
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                continue
+            frame = cv2.flip(frame, 1)
+            frame, r_res, l_res = process_img(hands, frame)
+            h, w = frame.shape[:2]
 
-            if hand_complete:
-                tips = np.array([r_res[0][k] for k in r_tip_keys])  # (4, 3)
-                tip_history.append(tips)
-                progress = len(tip_history) / CALIB_FRAMES
-
-                bar_w = int(w * 0.7)
-                bar_x = (w - bar_w) // 2
-                bar_y = h // 2 - 15
-                cv2.rectangle(
-                    frame, (bar_x, bar_y), (bar_x + bar_w, bar_y + 30), (40, 40, 40), -1
-                )
-                cv2.rectangle(
-                    frame,
-                    (bar_x, bar_y),
-                    (bar_x + int(bar_w * progress), bar_y + 30),
-                    (0, 200, 0),
-                    -1,
-                )
-                cv2.rectangle(
-                    frame,
-                    (bar_x, bar_y),
-                    (bar_x + bar_w, bar_y + 30),
-                    (255, 255, 255),
-                    2,
-                )
-                _draw_text_bg(
-                    frame,
-                    f"Keep hand open — {int(progress * 100)}%",
-                    (bar_x, bar_y - 10),
-                    0.7,
-                    (0, 255, 0),
-                )
-
-                if len(tip_history) >= CALIB_FRAMES:
-                    state = "done"
+            if not collecting:
+                _draw_text_bg(frame, "=== HAND CALIBRATION ===", (20, 45), 0.9, (0, 255, 255))
+                _draw_text_bg(frame, "Open both hands fully (palms facing camera)", (20, 90))
+                _draw_text_bg(frame, "Press SPACE to start", (20, 130))
+                _draw_text_bg(frame, "Press Q to skip", (20, 170), color=(160, 160, 160))
             else:
-                tip_history = []  # reset on hand loss
-                _draw_text_bg(
-                    frame,
-                    "Hand not detected — keep hand open and visible",
-                    (20, h // 2),
-                    0.65,
-                    (0, 80, 255),
-                )
+                bar_w = int(w * 0.4)
+                gap = int(w * 0.1)
+                bar_y = h // 2 - 15
 
-        cv2.imshow("MediaPipe Hands", frame)
-        key = cv2.waitKey(1) & 0xFF
+                for label, history, res, tip_keys, bar_x in (
+                    ("LEFT",  l_history, l_res, l_tip_keys, gap),
+                    ("RIGHT", r_history, r_res, r_tip_keys, gap + bar_w + gap),
+                ):
+                    hand_complete = res is not None and all(k in res[0] for k in tip_keys)
+                    if hand_complete:
+                        tips = np.array([res[0][k] for k in tip_keys])
+                        history.append(tips)
 
-        if key == ord("q"):
-            print("Calibration skipped — using identity corrections.")
-            return CalibResult()
-        if key == ord(" ") and state == "waiting":
-            state = "collecting"
-            tip_history = []
+                    progress = min(len(history) / CALIB_FRAMES, 1.0)
+                    done = len(history) >= CALIB_FRAMES
 
-    # ------------------------------------------------------------------
-    # Compute calibration from collected frames
-    # tip_history: list of CALIB_FRAMES x (4, 3)
-    tips_array = np.array(tip_history)  # (CALIB_FRAMES, 4, 3)
-    mean_tips = np.mean(tips_array, axis=0)  # (4, 3)
+                    bar_color = (0, 200, 0) if not done else (0, 160, 255)
+                    cv2.rectangle(
+                        frame, (bar_x, bar_y), (bar_x + bar_w, bar_y + 30), (40, 40, 40), -1
+                    )
+                    cv2.rectangle(
+                        frame,
+                        (bar_x, bar_y),
+                        (bar_x + int(bar_w * progress), bar_y + 30),
+                        bar_color,
+                        -1,
+                    )
+                    cv2.rectangle(
+                        frame, (bar_x, bar_y), (bar_x + bar_w, bar_y + 30), (255, 255, 255), 2
+                    )
+                    status = "OK" if done else f"{int(progress * 100)}%"
+                    _draw_text_bg(frame, f"{label}: {status}", (bar_x, bar_y - 10), 0.7,
+                                  (0, 255, 0) if not done else (0, 160, 255))
 
-    # X offsets for tip1, tip2, tip3: measure X[0] of each tip during the open-hand pose.
-    # These are subtracted during tracking so that X=0 for all three tips when the hand is open.
-    x_offsets = mean_tips[:3, 0].tolist()
+                    if not hand_complete and not done:
+                        history.clear()  # reset only this hand on loss
 
-    calib = CalibResult(x_offsets=x_offsets)
-    print(
-        f"Calibration complete — X offsets (tip1/2/3): {[f'{v:.4f}' for v in x_offsets]}"
-    )
+                if len(r_history) >= CALIB_FRAMES and len(l_history) >= CALIB_FRAMES:
+                    break
 
-    # Show summary for 2 s
+            cv2.imshow("MediaPipe Hands", frame)
+            key = cv2.waitKey(1) & 0xFF
+
+            if key == ord("q"):
+                print("Calibration skipped - using identity corrections.")
+                return {"r": CalibResult(), "l": CalibResult()}
+            if key == ord(" ") and not collecting:
+                collecting = True
+                r_history.clear()
+                l_history.clear()
+
+    except KeyboardInterrupt:
+        cv2.destroyAllWindows()
+        raise
+
+    def _compute(history):
+        mean_tips = np.mean(np.array(history), axis=0)  # (4, 3)
+        return CalibResult(x_offsets=mean_tips[:3, 0].tolist())
+
+    r_calib = _compute(r_history)
+    l_calib = _compute(l_history)
+
+    print(f"Calibration complete - R offsets: {[f'{v:.4f}' for v in r_calib.x_offsets]}")
+    print(f"Calibration complete - L offsets: {[f'{v:.4f}' for v in l_calib.x_offsets]}")
+
     ret, frame = cap.read()
     if ret:
         frame = cv2.flip(frame, 1)
         _draw_text_bg(frame, "Calibration complete!", (20, 45), 0.9, (0, 255, 0))
-        _draw_text_bg(
-            frame,
-            f"X offsets tip1/2/3: {[f'{v:.3f}' for v in x_offsets]}",
-            (20, 90),
-        )
-        _draw_text_bg(frame, "Starting tracking…", (20, 130), color=(200, 200, 200))
+        _draw_text_bg(frame, f"R offsets: {[f'{v:.3f}' for v in r_calib.x_offsets]}", (20, 90))
+        _draw_text_bg(frame, f"L offsets: {[f'{v:.3f}' for v in l_calib.x_offsets]}", (20, 130))
+        _draw_text_bg(frame, "Starting tracking...", (20, 170), color=(200, 200, 200))
         cv2.imshow("MediaPipe Hands", frame)
         cv2.waitKey(2000)
 
-    return calib
+    return {"r": r_calib, "l": l_calib}
 
 
 def apply_calibration(res, calib, prefix):
@@ -378,8 +369,8 @@ def main():
                     frame, r_res, l_res = process_img(hands, frame)
 
                     # Apply calibration corrections before sending
-                    r_res = apply_calibration(r_res, calib, "r")
-                    l_res = apply_calibration(l_res, calib, "l")
+                    r_res = apply_calibration(r_res, calib["r"], "r")
+                    l_res = apply_calibration(l_res, calib["l"], "l")
 
                     if r_res is not None:
                         node.send_output("r_hand_pos", pa.array(r_res))
