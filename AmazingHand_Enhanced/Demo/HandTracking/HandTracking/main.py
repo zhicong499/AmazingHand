@@ -36,7 +36,7 @@ def _draw_text_bg(
     cv2.putText(img, text, (x, y), font, font_scale, color, thickness, cv2.LINE_AA)
 
 
-def process_img(hand_proc, image):
+def process_img(hand_proc, image, calib=None):
     image.flags.writeable = False
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     results = hand_proc.process(image)
@@ -90,6 +90,19 @@ def process_img(hand_proc, image):
                         ].z,
                     ]
                 )  # base of the index finger
+                ring_mcp = np.array(
+                    [
+                        hand_landmarks.landmark[
+                            mp_hands.HandLandmark.RING_FINGER_MCP
+                        ].x,
+                        hand_landmarks.landmark[
+                            mp_hands.HandLandmark.RING_FINGER_MCP
+                        ].y,
+                        hand_landmarks.landmark[
+                            mp_hands.HandLandmark.RING_FINGER_MCP
+                        ].z,
+                    ]
+                )  # base of the ring finger
 
                 unit_z = (
                     mid_mcp - origin
@@ -183,11 +196,31 @@ def process_img(hand_proc, image):
                 tip3 = R @ (tip3_world - origin)
                 tip4 = R @ (tip4_world - origin)
 
+                middle_finger_mcp = R @ (mid_mcp - origin)
+                index_finger_mcp = R @ (index_mcp - origin)
+                ring_finger_mcp = R @ (ring_mcp - origin)
+
                 if handedness_classif.classification[0].label == "Right":
+                    if calib:
+                        # Tip can not be behind MCP if the finger is totally bent
+                        if tip1[2] - index_finger_mcp[2] < 0:
+                            tip1[0] = max(tip1[0], calib["r"].x_offsets[0])
+                        if tip2[2] - middle_finger_mcp[2] < 0:
+                            tip2[0] = max(tip2[0], calib["r"].x_offsets[1])
+                        if tip3[2] - ring_finger_mcp[2] < 0:
+                            tip3[0] = max(tip3[0], calib["r"].x_offsets[2])
                     r_res = [
                         {"r_tip1": tip1, "r_tip2": tip2, "r_tip3": tip3, "r_tip4": tip4}
                     ]
                 elif handedness_classif.classification[0].label == "Left":
+                    if calib:
+                        # Tip can not be behind MCP if the finger is totally bent
+                        if tip1[2] - index_finger_mcp[2] < 0:
+                            tip1[0] = max(tip1[0], calib["l"].x_offsets[0])
+                        if tip2[2] - middle_finger_mcp[2] < 0:
+                            tip2[0] = max(tip2[0], calib["l"].x_offsets[1])
+                        if tip3[2] - ring_finger_mcp[2] < 0:
+                            tip3[0] = max(tip3[0], calib["l"].x_offsets[2])
                     l_res = [
                         {"l_tip1": tip1, "l_tip2": tip2, "l_tip3": tip3, "l_tip4": tip4}
                     ]
@@ -226,8 +259,12 @@ def run_calibration(cap, hands):
         h, w = frame.shape[:2]
 
         if not collecting:
-            _draw_text_bg(frame, "=== HAND CALIBRATION ===", (20, 45), 0.9, (0, 255, 255))
-            _draw_text_bg(frame, "Open both hands fully (palms facing camera)", (20, 90))
+            _draw_text_bg(
+                frame, "=== HAND CALIBRATION ===", (20, 45), 0.9, (0, 255, 255)
+            )
+            _draw_text_bg(
+                frame, "Open both hands fully (palms facing camera)", (20, 90)
+            )
             _draw_text_bg(frame, "Press SPACE to start", (20, 130))
             _draw_text_bg(frame, "Press Q to skip", (20, 170), color=(160, 160, 160))
         else:
@@ -236,7 +273,7 @@ def run_calibration(cap, hands):
             bar_y = h // 2 - 15
 
             for label, history, res, tip_keys, bar_x in (
-                ("LEFT",  l_history, l_res, l_tip_keys, gap),
+                ("LEFT", l_history, l_res, l_tip_keys, gap),
                 ("RIGHT", r_history, r_res, r_tip_keys, gap + bar_w + gap),
             ):
                 hand_complete = res is not None and all(k in res[0] for k in tip_keys)
@@ -259,11 +296,20 @@ def run_calibration(cap, hands):
                     -1,
                 )
                 cv2.rectangle(
-                    frame, (bar_x, bar_y), (bar_x + bar_w, bar_y + 30), (255, 255, 255), 2
+                    frame,
+                    (bar_x, bar_y),
+                    (bar_x + bar_w, bar_y + 30),
+                    (255, 255, 255),
+                    2,
                 )
                 status = "OK" if done else f"{int(progress * 100)}%"
-                _draw_text_bg(frame, f"{label}: {status}", (bar_x, bar_y - 10), 0.7,
-                              (0, 160, 255) if not done else (0, 255, 0))
+                _draw_text_bg(
+                    frame,
+                    f"{label}: {status}",
+                    (bar_x, bar_y - 10),
+                    0.7,
+                    (0, 160, 255) if not done else (0, 255, 0),
+                )
 
                 if not hand_complete and not done:
                     history.clear()  # reset only this hand on loss
@@ -289,15 +335,23 @@ def run_calibration(cap, hands):
     r_calib = _compute(r_history)
     l_calib = _compute(l_history)
 
-    print(f"Calibration complete - R offsets: {[f'{v:.4f}' for v in r_calib.x_offsets]}")
-    print(f"Calibration complete - L offsets: {[f'{v:.4f}' for v in l_calib.x_offsets]}")
+    print(
+        f"Calibration complete - R offsets: {[f'{v:.4f}' for v in r_calib.x_offsets]}"
+    )
+    print(
+        f"Calibration complete - L offsets: {[f'{v:.4f}' for v in l_calib.x_offsets]}"
+    )
 
     ret, frame = cap.read()
     if ret:
         frame = cv2.flip(frame, 1)
         _draw_text_bg(frame, "Calibration complete!", (20, 45), 0.9, (0, 255, 0))
-        _draw_text_bg(frame, f"R offsets: {[f'{v:.3f}' for v in r_calib.x_offsets]}", (20, 90))
-        _draw_text_bg(frame, f"L offsets: {[f'{v:.3f}' for v in l_calib.x_offsets]}", (20, 130))
+        _draw_text_bg(
+            frame, f"R offsets: {[f'{v:.3f}' for v in r_calib.x_offsets]}", (20, 90)
+        )
+        _draw_text_bg(
+            frame, f"L offsets: {[f'{v:.3f}' for v in l_calib.x_offsets]}", (20, 130)
+        )
         _draw_text_bg(frame, "Starting tracking...", (20, 170), color=(200, 200, 200))
         cv2.imshow("MediaPipe Hands", frame)
         cv2.waitKey(2000)
@@ -361,7 +415,7 @@ def main():
 
                     frame = cv2.flip(frame, 1)
                     # process
-                    frame, r_res, l_res = process_img(hands, frame)
+                    frame, r_res, l_res = process_img(hands, frame, calib)
 
                     # Apply calibration corrections before sending
                     r_res = apply_calibration(r_res, calib["r"], "r")
