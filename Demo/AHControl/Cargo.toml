@@ -14,5 +14,5 @@ facet = "0.27.14"
 facet-pretty = "0.23.21"
 facet-toml = "0.25.15"
 rustypot = "1.1.0"
-serialport = "4.7.2"
+serialport = { version = "4.7.2", default-features = false }
 toml = "0.8.23"

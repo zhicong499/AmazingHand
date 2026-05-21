@@ -1,4 +1,5 @@
 import argparse
+import glob
 import os
 import time
 
@@ -14,6 +15,37 @@ mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 
 # https://mediapipe.readthedocs.io/en/latest/solutions/hands.html
+
+def open_camera():
+    forced_device = os.environ.get("AH_CAMERA_DEVICE")
+    forced_index = os.environ.get("AH_CAMERA_INDEX")
+    if forced_device is not None:
+        candidates = [forced_device]
+    elif forced_index is not None:
+        candidates = [f"/dev/video{forced_index}"]
+    else:
+        candidates = sorted(glob.glob("/dev/video*"))
+
+    for device in candidates:
+        cap = cv2.VideoCapture(device, cv2.CAP_V4L2)
+        if not cap.isOpened():
+            cap.release()
+            continue
+
+        ret, frame = False, None
+        for _ in range(5):
+            ret, frame = cap.read()
+            if ret and frame is not None:
+                break
+            time.sleep(0.1)
+
+        if ret and frame is not None:
+            print(f"Using camera device {device}")
+            return cap
+
+        cap.release()
+
+    raise RuntimeError(f"No readable camera found in devices: {list(candidates)}")
 
 def process_img(hand_proc, image):
     image.flags.writeable = False
@@ -174,7 +206,7 @@ def main():
 
 
     pa.array([])  # initialize pyarrow array
-    cap = cv2.VideoCapture(0)
+    cap = open_camera()
 
     with mp_hands.Hands(
             model_complexity=0,

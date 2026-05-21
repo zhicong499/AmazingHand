@@ -126,7 +126,7 @@
       <!-- Link custom_servo_horn -->
       <body name="custom_servo_horn" pos="-0.00755 0.03055 0.0698" quat="0.5 0.5 -0.5 -0.5">
         <!-- Joint from r_wrist_interface to custom_servo_horn -->
-        <joint axis="0 0 1" name="finger1_motor1" type="hinge" range="-1.570796326768256 1.570796326821537"/>
+        <joint axis="0 0 1" name="finger1_motor1" type="hinge" range="-2 2"/>
         <inertial pos="-0.005 1.45507e-17 -0.00655938" mass="0.000410988" fullinertia="4.63584e-09 4.63584e-09 1e-09 -5.13695e-25 3.61104e-25 -1.47358e-24"/>
         <!-- Part rotule_ball -->
         <geom type="mesh" class="visual" pos="-0.005 1.38778e-17 -0.0069" quat="1 9.70811e-17 -3.33067e-16 3.07803e-16" mesh="rotule_ball" material="rotule_ball_material"/>
@@ -232,7 +232,7 @@
       <!-- Link rotule_ball_2 -->
       <body name="rotule_ball_2" pos="-0.00755 0.01845 0.0698" quat="0.5 -0.5 -0.5 0.5">
         <!-- Joint from r_wrist_interface to rotule_ball_2 -->
-        <joint axis="0 0 1" name="finger1_motor2" type="hinge" range="-1.5707963267948883 1.5707963267949048"/>
+        <joint axis="0 0 1" name="finger1_motor2" type="hinge" range="-2 2"/>
         <inertial pos="-0.005 2.84284e-17 -0.00655938" mass="0.000410988" fullinertia="4.63584e-09 4.63584e-09 1e-09 -1.2178e-24 2.21903e-24 1.16352e-24"/>
         <!-- Part custom_servo_horn_2 -->
         <geom type="mesh" class="visual" pos="0 1.38778e-17 -0.0025" quat="0 1 0 0" mesh="custom_servo_horn" material="custom_servo_horn_material"/>
@@ -260,7 +260,7 @@
       <!-- Link custom_servo_horn_2 -->
       <body name="custom_servo_horn_2" pos="-0.00755 0.00110358 0.0645642" quat="0.473147 0.525483 -0.473147 -0.525483">
         <!-- Joint from r_wrist_interface to custom_servo_horn_2 -->
-        <joint axis="0 0 1" name="finger2_motor1" type="hinge" range="-1.5707963267682898 1.5707963268215033"/>
+        <joint axis="0 0 1" name="finger2_motor1" type="hinge" range="-2 2"/>
         <inertial pos="-0.005 5.48009e-18 -0.00655938" mass="0.000410988" fullinertia="4.63584e-09 4.63584e-09 1e-09 6.82528e-24 -1.65246e-24 1.18606e-24"/>
         <!-- Part rotule_ball_5 -->
         <geom type="mesh" class="visual" pos="-0.005 2.77556e-17 -0.0069" quat="1 -1.68042e-16 5.55112e-17 -1.40183e-16" mesh="rotule_ball" material="rotule_ball_material"/>
@@ -366,7 +366,7 @@
       <!-- Link rotule_ball_4 -->
       <body name="rotule_ball_4" pos="-0.00755 -0.0109301 0.0632994" quat="0.525483 -0.473147 -0.525483 0.473147">
         <!-- Joint from r_wrist_interface to rotule_ball_4 -->
-        <joint axis="0 0 1" name="finger2_motor2" type="hinge" range="-1.5707963267948954 1.5707963267948977"/>
+        <joint axis="0 0 1" name="finger2_motor2" type="hinge" range="-2 2"/>
         <inertial pos="-0.005 -1.91124e-17 -0.00655938" mass="0.000410988" fullinertia="4.63584e-09 4.63584e-09 1e-09 -1.64426e-23 6.21326e-24 6.1495e-24"/>
         <!-- Part ph_pan_head_screw_m2x0_40_x_10__2803432263e518bbd16bccbbef8784ed_8 -->
         <geom type="mesh" class="visual" pos="-0.005 -1.38778e-17 -0.0114" quat="3.55562e-17 0.707107 0.707107 1.08081e-15" mesh="ph_pan_head_screw_m2x0_40_x_10__2803432263e518bbd16bccbbef8784ed" material="ph_pan_head_screw_m2x0_40_x_10__2803432263e518bbd16bccbbef8784ed_material"/>
@@ -394,7 +394,7 @@
       <!-- Link custom_servo_horn_3 -->
       <body name="custom_servo_horn_3" pos="-0.00755 -0.0270535 0.0550493" quat="0.437766 0.555303 -0.437766 -0.555303">
         <!-- Joint from r_wrist_interface to custom_servo_horn_3 -->
-        <joint axis="0 0 1" name="finger3_motor1" type="hinge" range="-1.5707963267948988 1.5707963267948943"/>
+        <joint axis="0 0 1" name="finger3_motor1" type="hinge" range="-2 2"/>
         <inertial pos="-0.005 -2.58963e-18 -0.00655938" mass="0.000410988" fullinertia="4.63584e-09 4.63584e-09 1e-09 4.09994e-25 -7.83529e-24 7.96981e-24"/>
         <!-- Part rotule_ball_9 -->
         <geom type="mesh" class="visual" pos="-0.005 -6.93889e-18 -0.0069" quat="1 -1.31537e-16 -3.747e-16 -6.03194e-16" mesh="rotule_ball" material="rotule_ball_material"/>
@@ -500,7 +500,7 @@
       <!-- Link rotule_ball_6 -->
       <body name="rotule_ball_6" pos="-0.00755 -0.0388192 0.0522246" quat="0.555303 -0.437766 -0.555303 0.437766">
         <!-- Joint from r_wrist_interface to rotule_ball_6 -->
-        <joint axis="0 0 1" name="finger3_motor2" type="hinge" range="-1.570796326794957 1.5707963267948362"/>
+        <joint axis="0 0 1" name="finger3_motor2" type="hinge" range="-2 2"/>
         <inertial pos="-0.005 2.08033e-17 -0.00655938" mass="0.000410988" fullinertia="4.63584e-09 4.63584e-09 1e-09 -6.35081e-25 7.08918e-25 2.67184e-25"/>
         <!-- Part rotule_ball_12 -->
         <geom type="mesh" class="visual" pos="-0.005 1.38778e-17 -0.0069" quat="1 -2.43774e-17 -8.32667e-17 5.7167e-17" mesh="rotule_ball" material="rotule_ball_material"/>
@@ -528,7 +528,7 @@
       <!-- Link custom_servo_horn_4 -->
       <body name="custom_servo_horn_4" pos="-0.000298971 0.00773341 0.03365" quat="1.09642e-15 0.573573 0.819154 2.26766e-16">
         <!-- Joint from r_wrist_interface to custom_servo_horn_4 -->
-        <joint axis="0 0 1" name="finger4_motor1" type="hinge" range="-1.5707889966987234 1.5708036568910697"/>
+        <joint axis="0 0 1" name="finger4_motor1" type="hinge" range="-2 2"/>
         <inertial pos="-0.005 1.34196e-17 -0.00655938" mass="0.000410988" fullinertia="4.63584e-09 4.63584e-09 1e-09 -8.22944e-25 -2.0357e-26 -1.90632e-25"/>
         <!-- Part rotule_ball_13 -->
         <geom type="mesh" class="visual" pos="-0.005 1.25767e-17 -0.0069" quat="1 -0 -3.46945e-17 1.10259e-15" mesh="rotule_ball" material="rotule_ball_material"/>
@@ -634,7 +634,7 @@
       <!-- Link rotule_ball_8 -->
       <body name="rotule_ball_8" pos="-0.00443741 0.0191037 0.03365" quat="1.42065e-15 -0.819152 0.573576 6.98838e-17">
         <!-- Joint from r_wrist_interface to rotule_ball_8 -->
-        <joint axis="0 0 1" name="finger4_motor2" type="hinge" range="-1.5707963267948957 1.5707963267948974"/>
+        <joint axis="0 0 1" name="finger4_motor2" type="hinge" range="-2 2"/>
         <inertial pos="-0.005 1.88698e-17 -0.00655938" mass="0.000410988" fullinertia="4.63584e-09 4.63584e-09 1e-09 -4.00135e-25 1.5509e-24 -3.69519e-24"/>
         <!-- Part ph_pan_head_screw_m2x0_40_x_10__2803432263e518bbd16bccbbef8784ed_16 -->
         <geom type="mesh" class="visual" pos="-0.005 1.51788e-17 -0.0114" quat="3.76147e-16 0.707107 0.707107 -1.51782e-16" mesh="ph_pan_head_screw_m2x0_40_x_10__2803432263e518bbd16bccbbef8784ed" material="ph_pan_head_screw_m2x0_40_x_10__2803432263e518bbd16bccbbef8784ed_material"/>
