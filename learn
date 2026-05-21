@@ -1,0 +1,321 @@
+我看完了,这个项目本质上是一个 **开源四指机器人手 Amazing Hand** 的完整资料仓库：既有机械结构文件,也有真实硬件控制代码,还有摄像头手势追踪 + MuJoCo 仿真 + 真实舵机联动的高级 Demo。
+
+**整体结构**
+```text
+D:\AmazingHand
+├─ README.md                 项目总说明：硬件目标、构建方式、基础 Demo、社区资料
+├─ docs\                     PDF 文档：总览、装配、3D 打印建议、联系方式
+├─ assets\                   README 和文档里用到的图片/视频素材
+├─ cad\                      机械 CAD 文件,包含 STL 和 STEP
+├─ ArduinoExample\           Arduino + Feetech TTL Linker 控制示例
+├─ PythonExample\            Python + 串口总线驱动控制示例
+└─ Demo\                     高级 Demo：手部追踪、MuJoCo 仿真、Rust 硬件控制、dora 数据流
+```
+
+**这个项目在做什么**
+
+Amazing Hand 是一个 4 指、8 自由度的机械手。每根手指有 2 个小型 Feetech SCS0009 舵机,所以总共 8 个舵机：
+
+```text
+食指   motor 1, 2
+中指   motor 3, 4
+无名指 motor 5, 6
+拇指   motor 7, 8
+```
+
+每根手指不是简单用一个舵机弯曲,而是用两个舵机配合一个平行机构,让手指可以做弯曲/伸展和外展/内收。也就是说,代码里很多地方的两个角度参数,其实就是一根手指的两个驱动输入。
+
+**机械资料部分**
+
+[cad](D:/AmazingHand/cad) 是给制造用的。里面分成：
+
+```text
+cad\stl\   用于 3D 打印的网格文件
+cad\step\  用于 CAD 软件修改/查看的工程文件
+```
+
+[docs](D:/AmazingHand/docs) 里是项目文档,比如装配指南、3D 打印建议、项目总览 PDF。  
+[assets](D:/AmazingHand/assets) 主要是图片、视频截图和 README 插图,不是核心代码。
+
+**基础控制示例**
+
+[PythonExample](D:/AmazingHand/PythonExample) 和 [ArduinoExample](D:/AmazingHand/ArduinoExample) 是两套“直接控制真实机械手”的简单方案。
+
+Python 版本里,核心文件是 [AmazingHand_Demo.py](D:/AmazingHand/PythonExample/AmazingHand_Demo.py)。它使用 `rustypot` 里的 `Scs0009PyController`,通过串口连接 Feetech 舵机,然后循环执行一系列固定手势：
+
+```text
+OpenHand
+CloseHand
+SpreadHand
+ClenchHand
+Index_Pointing
+Victory
+Pinched
+...
+```
+
+这些动作最终都会落到类似 `Move_Index(angle1, angle2, speed)` 这样的函数上,再写入舵机 1 和 2。中指、无名指、拇指同理。
+
+Arduino 版本 [Amazing_Hand_Demo.ino](D:/AmazingHand/ArduinoExample/Amazing_Hand_Demo.ino) 做的是同样的事情,只是运行在 Arduino 上,通过 `SCServo` 库控制舵机。它更适合不想跑 Python、只想让板子独立执行动作的场景。
+
+**高级 Demo 部分**
+
+[Demo](D:/AmazingHand/Demo) 是这个仓库里最“软件工程化”的部分。它用 `dora-rs` 把多个节点串起来：
+
+```text
+摄像头手势追踪
+      ↓
+MediaPipe 提取人手指尖位置
+      ↓
+MuJoCo + Mink 做逆运动学
+      ↓
+得到机械手 8 个电机目标角
+      ↓
+Rust 控制节点发给真实 Feetech 舵机
+```
+
+这里有三个主要模块：
+
+```text
+Demo\HandTracking\    Python,摄像头 + MediaPipe,识别人手
+Demo\AHSimulation\    Python,MuJoCo + Mink,机械手仿真和逆解
+Demo\AHControl\       Rust,真实舵机控制
+```
+
+[HandTracking/main.py](D:/AmazingHand/Demo/HandTracking/HandTracking/main.py) 会打开摄像头,用 MediaPipe 识别人手关键点,然后输出：
+
+```text
+r_hand_pos
+l_hand_pos
+```
+
+也就是右手/左手的指尖目标位置。它会把食指、中指、无名指、拇指的 tip 向量整理成 `r_tip1`、`r_tip2`、`r_tip3`、`r_tip4` 这样的数据。
+
+[AHSimulation/mj_mink_right.py](D:/AmazingHand/Demo/AHSimulation/AHSimulation/mj_mink_right.py) 是右手机械手仿真节点。它加载：
+
+```text
+Demo\AHSimulation\AHSimulation\AH_Right\mjcf\scene.xml
+```
+
+然后用 MuJoCo 显示机械手模型,用 Mink 做逆运动学。它可以接受两种控制模式：
+
+```text
+pos   控制指尖目标位置
+quat  控制指尖目标姿态/四元数
+```
+
+它的输出是：
+
+```text
+mj_r_joints_pos
+```
+
+这就是仿真算出来的 8 个电机角度。
+
+[AHControl/src/main.rs](D:/AmazingHand/Demo/AHControl/src/main.rs) 是真实硬件控制节点。它读取 [r_hand.toml](D:/AmazingHand/Demo/AHControl/config/r_hand.toml) 里的电机配置,包括：
+
+```text
+每根手指名字
+两个电机 ID
+角度 offset
+是否 invert
+电机型号
+```
+
+然后它监听 dora 输入,比如 `mj_r_joints_pos`,把仿真输出的目标角度加上 offset / invert 之后,通过串口写给 SCS0009 舵机。
+
+**dora 数据流配置**
+
+`dora`，这里准确说是 **dora-rs**，是一个用来把多个程序串成“数据流”的运行框架。你可以把它理解成机器人/AI 项目里的 **节点编排器**。
+
+在这个项目里，它负责把这些模块连接起来：
+
+```text
+HandTracking 摄像头追踪节点
+        ↓
+AHSimulation 仿真/逆运动学节点
+        ↓
+AHControl 真实舵机控制节点
+```
+
+每个模块都是一个 **node**，也就是节点。节点之间通过命名的输入输出通信。
+
+比如 [dataflow_tracking_real.yml](D:/AmazingHand/Demo/dataflow_tracking_real.yml) 里：
+
+```yaml
+nodes:
+  - id: hand_tracker
+    path: HandTracking/HandTracking/main.py
+    outputs:
+      - r_hand_pos
+
+  - id: r_hand_simulation
+    path: AHSimulation/AHSimulation/mj_mink_right.py
+    inputs:
+      r_hand_pos: hand_tracker/r_hand_pos
+    outputs:
+      - mj_r_joints_pos
+
+  - id: hand_controller
+    path: target/debug/AHControl
+    inputs:
+      mj_r_joints_pos: r_hand_simulation/mj_r_joints_pos
+```
+
+意思就是：
+
+```text
+hand_tracker 输出 r_hand_pos
+r_hand_simulation 接收 r_hand_pos，输出 mj_r_joints_pos
+hand_controller 接收 mj_r_joints_pos，控制真实舵机
+```
+
+在 Python 代码里，dora 的用法像这样：
+
+```python
+from dora import Node
+
+node = Node()
+
+for event in node:
+    if event["type"] == "INPUT":
+        ...
+        node.send_output("r_hand_pos", pa.array(r_res))
+```
+
+它会不断接收 dora 运行时发来的事件，比如定时器 `tick`，然后节点处理数据，再用 `send_output()` 发给下游节点。
+
+所以一句话说：
+
+**dora 是这个项目的“数据管道和调度器”。它不负责识别手，也不负责仿真，也不直接控制舵机；它负责让这些独立程序按配置连接起来、互相传数据。**
+
+如果不用 dora，你就得自己写一个大程序，把摄像头、MediaPipe、MuJoCo、串口控制全部揉在一起。用 dora 后，每个模块可以单独写、单独测试，再通过 `.yml` 拼起来。
+
+
+几个 `.yml` 文件定义了不同运行方式：
+
+[dataflow_tracking_simu.yml](D:/AmazingHand/Demo/dataflow_tracking_simu.yml)  
+摄像头追踪 -> 左右手仿真,只看仿真,不控制真实硬件。
+
+[dataflow_tracking_real.yml](D:/AmazingHand/Demo/dataflow_tracking_real.yml)  
+摄像头追踪 -> 右手仿真逆解 -> Rust 控制真实右手机械手。
+
+[dataflow_tracking_real_2hands.yml](D:/AmazingHand/Demo/dataflow_tracking_real_2hands.yml)  
+摄像头追踪 -> 左右手仿真逆解 -> 控制双手硬件。
+
+[dataflow_angle_simu.yml](D:/AmazingHand/Demo/dataflow_angle_simu.yml)  
+不用摄像头,而是用 [finger_angle_control.py](D:/AmazingHand/Demo/AHSimulation/examples/finger_angle_control.py) 生成周期性角度,驱动仿真手运动。
+
+**你可以这样理解它**
+
+这个项目有三层：
+
+```text
+第 1 层：机械层
+cad + docs + assets
+负责告诉你怎么打印、装配、理解机械手结构。
+
+第 2 层：基础控制层
+PythonExample + ArduinoExample
+直接给 8 个舵机发角度,适合校准、测试、播放固定动作。
+
+第 3 层：高级交互层
+Demo/HandTracking + AHSimulation + AHControl
+用摄像头捕捉人手,用仿真做逆运动学,再把目标角度发给真实手。
+```
+
+最重要的一条主线是：
+
+```text
+人手摄像头画面
+→ MediaPipe 关键点
+→ 指尖目标位置
+→ MuJoCo/Mink 逆运动学
+→ 8 个舵机目标角
+→ Rust 串口控制
+→ 真实 Amazing Hand 运动
+```
+
+小提醒：仓库里没有传统意义上的自动化测试,只有 `FingerTest` 这种硬件测试脚本。这个项目更像“机械开源套件 + 控制 Demo”,不是一个常规 Web/后端软件项目。
+
+`dora`,这里准确说是 **dora-rs**,是一个用来把多个程序串成“数据流”的运行框架。你可以把它理解成机器人/AI 项目里的 **节点编排器**。
+
+在这个项目里,它负责把这些模块连接起来：
+
+```text
+HandTracking 摄像头追踪节点
+        ↓
+AHSimulation 仿真/逆运动学节点
+        ↓
+AHControl 真实舵机控制节点
+```
+
+每个模块都是一个 **node**,也就是节点。节点之间通过命名的输入输出通信。
+
+比如 [dataflow_tracking_real.yml](D:/AmazingHand/Demo/dataflow_tracking_real.yml) 里：
+
+```yaml
+nodes:
+  - id: hand_tracker
+    path: HandTracking/HandTracking/main.py
+    outputs:
+      - r_hand_pos
+
+  - id: r_hand_simulation
+    path: AHSimulation/AHSimulation/mj_mink_right.py
+    inputs:
+      r_hand_pos: hand_tracker/r_hand_pos
+    outputs:
+      - mj_r_joints_pos
+
+  - id: hand_controller
+    path: target/debug/AHControl
+    inputs:
+      mj_r_joints_pos: r_hand_simulation/mj_r_joints_pos
+```
+
+意思就是：
+
+```text
+hand_tracker 输出 r_hand_pos
+r_hand_simulation 接收 r_hand_pos,输出 mj_r_joints_pos
+hand_controller 接收 mj_r_joints_pos,控制真实舵机
+```
+
+在 Python 代码里,dora 的用法像这样：
+
+```python
+from dora import Node
+
+node = Node()
+
+for event in node:
+    if event["type"] == "INPUT":
+        ...
+        node.send_output("r_hand_pos", pa.array(r_res))
+```
+
+它会不断接收 dora 运行时发来的事件,比如定时器 `tick`,然后节点处理数据,再用 `send_output()` 发给下游节点。
+
+所以一句话说：
+
+**dora 是这个项目的“数据管道和调度器”。它不负责识别手,也不负责仿真,也不直接控制舵机；它负责让这些独立程序按配置连接起来、互相传数据。**
+
+如果不用 dora,你就得自己写一个大程序,把摄像头、MediaPipe、MuJoCo、串口控制全部揉在一起。用 dora 后,每个模块可以单独写、单独测试,再通过 `.yml` 拼起来。
+
+
+
+现在需确认两个问题：
+1:urdf的问题导致奖励为0
+去b站飞的岛博主学习并联结构的urdf写法,修改后验证奖励是否正常。
+
+2:gym对并联机构不友好,导致奖励为0
+方法:普通 MuJoCo 单环境
+   先验证 Amazing Hand + screwdriver + reward 能跑通。
+  
+先采用第二个方法,验证 Amazing Hand + screwdriver + reward 能跑通。
+
+3:用sw自己导出urdf
+自己设置转动轴,这本来就是串联的,剩下的串并联解算靠单独的正逆运动学模块来做。
+
+4:用mujoco开源的手势追踪项目

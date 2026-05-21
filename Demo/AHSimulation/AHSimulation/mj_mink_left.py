@@ -208,10 +208,10 @@ class Client:
                         self.metadata["l_finger4"]=[6,7]
 
                         self.motor_pos=np.zeros(8);
-                        self.motor_pos[self.metadata["l_finger1"]]=np.array([self.data.joint(f1_motor1).qpos[0],self.data.joint(f1_motor2).qpos[0]])
+                        # self.motor_pos[self.metadata["l_finger1"]]=np.array([self.data.joint(f1_motor1).qpos[0],self.data.joint(f1_motor2).qpos[0]])
                         self.motor_pos[self.metadata["l_finger2"]]=np.array([self.data.joint(f2_motor1).qpos[0],self.data.joint(f2_motor2).qpos[0]])
-                        self.motor_pos[self.metadata["l_finger3"]]=np.array([self.data.joint(f3_motor1).qpos[0],self.data.joint(f3_motor2).qpos[0]])
-                        self.motor_pos[self.metadata["l_finger4"]]=np.array([self.data.joint(f4_motor1).qpos[0],self.data.joint(f4_motor2).qpos[0]])
+                        # self.motor_pos[self.metadata["l_finger3"]]=np.array([self.data.joint(f3_motor1).qpos[0],self.data.joint(f3_motor2).qpos[0]])
+                        # self.motor_pos[self.metadata["l_finger4"]]=np.array([self.data.joint(f4_motor1).qpos[0],self.data.joint(f4_motor2).qpos[0]])
 
 
 

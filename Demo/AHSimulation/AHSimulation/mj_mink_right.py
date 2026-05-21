@@ -211,7 +211,7 @@ class Client:
                         self.motor_pos[self.metadata["r_finger2"]]=np.array([self.data.joint(f2_motor1).qpos[0],self.data.joint(f2_motor2).qpos[0]])
                         self.motor_pos[self.metadata["r_finger3"]]=np.array([self.data.joint(f3_motor1).qpos[0],self.data.joint(f3_motor2).qpos[0]])
                         self.motor_pos[self.metadata["r_finger4"]]=np.array([self.data.joint(f4_motor1).qpos[0],self.data.joint(f4_motor2).qpos[0]])
-
+                        # print(f"motor_pos: {self.motor_pos}")
 
 
                         viewer.sync()
